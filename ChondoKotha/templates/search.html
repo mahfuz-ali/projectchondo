@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+{#    <style>#}
+{#        .red{#}
+{#            border: 2px solid red;;#}
+{#        }#}
+{#        .green{#}
+{#            border: 2px solid green;#}
+{#        }#}
+{#    </style>#}
+</head>
+<body>
+    <div id="root">
+        <h1 align="center">
+            [[ greetings ]]
+        </h1>
+        <br>
+{#+++++++++++++++++++++++  #}
+        <div class="container-fluid" style="align:center">
+            <form class="form-inline col-md-8 col-md-offset-2" action="">
+                {% csrf_token %}
+{#                 <div class="form-group col-md-3">#}
+{#                    <label for="exampleFormControlSelect1">Division</label>#}
+{#                    <select class="form-control" id="exampleFormControlSelect1"  @change="onChangeDivision">#}
+{#                      <option v-for="division in divisions"#}
+{#                              :value="[[ division.id ]]">[[ division.name ]]</option>#}
+{#                    </select>#}
+{#                </div>#}
+                <div class="form-group col-md-3">
+                    <label for="exampleFormControlSelect1">Division</label>
+                    <select class="form-control" id="exampleFormControlSelect1" v-model="formData.division"   @change="onChangeDivision">
+                        <option v-for="division in divisions"
+                              :value="[[ division.id ]]"
+                                >[[ division.name ]]
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleFormControlSelect1">District</label>
+                    <select class="form-control" id="exampleFormControlSelect1" v-model="formData.district"   @change="onChangeDistrict">
+                      <option v-for="district in districts"
+                              :value="[[ district.id ]]">[[ district.name ]]</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleFormControlSelect1">Category</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                      <option v-for="category in categories"
+                              :value="[[ category.id ]]">[[ category.name ]]</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <button type="submit" class="btn btn-primary mb-2">Search</button>
+                </div>
+            </form>
+        </div>
+        <br>
+
+        <div align="center" style="margin-top: 50px">
+            <label class="from-control" for="exampleFormControlSelect1">Chondokotha</label>
+            <input v-for="chondokotha in chondokothas" :value="[[ chondokotha.title ]]">
+        </div>
+
+    </div>
+
+</body>
+<script>
+
+    Vue.component('division-list', {
+        {#props: ['cars','divisions','categories','districts','chondokothas'],#}
+        {#template:`#}
+        {#<ul>#}
+        {#    <li v-for="car in cars">{{car.name }}</li>#}
+        {#</ul>`#}
+
+    })
+    app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#root',
+        component:[
+            'car-list','division-list'
+        ],
+        data:{
+            greetings: 'Search Chondokotha',
+            divisions: [],
+            categories: [],
+            districts: [],
+            chondokothas: [],
+            formData:{
+                division: null,
+                district: null
+            },
+            // email: ''
+            cars: [
+                // 'Toyota',
+                // 'Honda',
+                // 'Murcidize',
+                // 'Mitsubisi',
+                // 'Jaguar'
+                { name: 'Toyota'},
+                { name: 'Honda'},
+                { name:'Murcidize'},
+                { name:'Jaguar'}
+
+            ],
+            newCar: '',
+
+        },
+        methods:{
+            addCar: function(){
+                this.cars.push({name:this.newCar})
+                this.newCar = ''
+            },
+            onChangeDivision(){
+
+                console.log(this.formData.division)
+
+                {#console.log(event.formData.division)#}
+
+                divisionId = this.formData.division;
+                axios.get( 'http://127.0.0.1:8000/district/?division='+divisionId)
+
+                    .then(response => {
+                        console.log(response.data.District)
+
+                        this.districts = response.data.District
+
+                    })
+
+            },
+            onChangeDistrict(){
+                districtId = this.formData.district;
+                console.log(districtId)
+            }
+
+        },
+        filters:{
+            capitalize: function(value){
+                return value.toUpperCase()
+            },
+            addstring: function(value){
+                return value + ' Text added'
+            }
+        },
+
+
+
+        created() {
+
+
+            {#axios.get( 'http://127.0.0.1:8000/district/')#}
+            {##}
+            {#    .then(response => {#}
+            {##}
+            {#        console.log(response.data.District)#}
+            {##}
+            {#        this.districts = response.data.District#}
+            {##}
+            {#    }),#}
+
+            axios.get('http://127.0.0.1:8000/data/')
+
+                .then(response => {
+
+                    console.log(response.data.division)
+                    console.log(response.data.category)
+
+
+                    this.divisions = response.data.division
+                    this.categories = response.data.category
+
+
+                })
+
+            axios.get('http://127.0.0.1:8000/chondokotha/')
+
+                .then(response => {
+
+                    console.log(response.data.chondokotha)
+
+                    this.chondokothas = response.data.chondokotha
+
+
+                })
+            return onChangeDivision()
+
+        }
+
+
+    })
+</script>
+
+
+</html>
+
